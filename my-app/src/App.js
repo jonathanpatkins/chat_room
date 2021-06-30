@@ -9,6 +9,16 @@ import 'firebase/analytics';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 
+import Button from '@material-ui/core/Button';
+
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
+
+
 firebase.initializeApp({
   // your config
   apiKey: "AIzaSyB47ZMyV6oUbh-n68_y734G8t47tUYPt7E",
@@ -36,11 +46,86 @@ function App() {
       </header>
 
       <section>
-        {user ? <ChatRoom /> : <SignIn />}
+        {user ? <HoldingPage /> : <SignIn />}
       </section>
 
     </div>
   );
+}
+
+function HoldingPage() {
+  return (
+    <React.Fragment>
+      <Router>
+        <h1>
+          This is the holding page
+        </h1>
+      <div>
+        <ul>
+          <li>
+            <Link to="/Room1">Room #1</Link>
+          </li>
+          <li>
+            <Link to="/Room2">Room #2</Link>
+          </li>
+        </ul>
+
+        <hr />
+
+        {/*
+          A <Switch> looks through all its children <Route>
+          elements and renders the first one whose path
+          matches the current URL. Use a <Switch> any time
+          you have multiple routes, but you want only one
+          of them to render at a time
+        */}
+        <Switch>
+          <Route exact path="/">
+            <HoldingPage />
+          </Route>
+          <Route path="/Room1">
+            <Room1 />
+          </Route>
+          <Route path="/Room2">
+            <Room2 />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
+    </React.Fragment>
+  )
+}
+
+
+function ChooseRoom() {
+  return (
+    <>
+      <Router>
+        <div>
+          <ul>
+            <li>
+              <Link to="/Room1">Room #1</Link>
+            </li>
+            <li>
+              <Link to="/Room2">Room #2</Link>
+            </li>
+          </ul>
+        </div>
+      </Router>
+    </>
+  )
+}
+
+function Room1() {
+  return (
+    <ChatRoom roomNumber="1"/>
+  )
+}
+
+function Room2() {
+  return (
+    <ChatRoom roomNumber="2"/>
+  )
 }
 
 function SignIn() {
@@ -66,9 +151,11 @@ function SignOut() {
 }
 
 
-function ChatRoom() {
+function ChatRoom(props) {
   const dummy = useRef();
-  const messagesRef = firestore.collection('messages');
+
+  // This is how something gets put into the database
+  const messagesRef = firestore.collection(`messages${props.roomNumber}`);
   const query = messagesRef.orderBy('createdAt').limit(25);
 
   const [messages] = useCollectionData(query, { idField: 'id' });
@@ -94,7 +181,7 @@ function ChatRoom() {
 
   return (<>
     <main>
-
+      {/* This is where we render what was in the database */}
       {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
 
       <span ref={dummy}></span>
