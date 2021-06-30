@@ -144,11 +144,15 @@ const Board = () => {
             const x1 = (e.clientX || e.touches[0].clientX) / w;
             const y1 = (e.clientY || e.touches[0].clientY) / h;
 
-            // drawLine(x0, y0, x1, y1, current.color);
-            sendMessage(x0, y0, x1, y1, current.color);
+             if (Math.abs(current.x - (e.clientX || e.touches[0].clientX)) + Math.abs(current.y - (e.clientY || e.touches[0].clientY)) > 50) {
+                // drawLine(x0, y0, x1, y1, current.color);
+                sendMessage(x0, y0, x1, y1, current.color);
 
-            current.x = e.clientX || e.touches[0].clientX;
-            current.y = e.clientY || e.touches[0].clientY;
+                current.x = e.clientX || e.touches[0].clientX;
+                current.y = e.clientY || e.touches[0].clientY;
+             }
+
+            
         };
 
         const onMouseUp = (e) => {
@@ -230,3 +234,10 @@ const Board = () => {
 };
 
 export default Board;
+
+
+
+// what if the person drawing got things in real time
+// but I added a function called update using set interval that every half second
+// would then check the database and redraw the lines from that only drawing lines after a certain time
+// that was on the board for th
