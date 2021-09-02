@@ -252,3 +252,7 @@ export default Board;
 
 // we could store stuff in that data base and on reload it grabs it from there and after that socketio stuff takes over
 // should also be able to change the pen size with a slider
+
+
+
+// how can I implement socketio?
