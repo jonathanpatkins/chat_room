@@ -3,6 +3,7 @@ import Image from "next/image";
 import React, { useState, Component, useRef } from "react";
 import Layout from "../components/Layout";
 import Button from "react-bootstrap/Button";
+import Container from "react-bootstrap/Container";
 
 import { firestore, auth } from "../utils/firebase";
 
@@ -23,8 +24,19 @@ export default function Home() {
   const [user] = useAuthState(auth);
   return (
     <Layout>
-      <h1>Here will be the holding page for the app</h1>
-      <section>{user ? <ListOfChats /> : <SignIn />}</section>
+      <IndexContainer fluid>
+        <div>
+          <h3>List of Rooms</h3>
+          <section>{user ? <ListOfChats /> : <SignIn />}</section>
+        </div>
+      </IndexContainer>
     </Layout>
   );
 }
+
+const IndexContainer = styled(Container)`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;

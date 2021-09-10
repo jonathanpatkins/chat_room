@@ -7,6 +7,10 @@ import firebase from "firebase/app";
 
 import { useCollectionData } from "react-firebase-hooks/firestore";
 
+import styled from "styled-components";
+
+import { theme } from "../styles/theme";
+
 export const ListOfChats = () => {
   const roomsRef = firestore.collection("numberOfRooms");
   const query = roomsRef.orderBy("createdAt");
@@ -46,17 +50,17 @@ export const PickChat = ({ rooms, setChatroom, roomsRef }) => {
         rooms.map((room) => {
           console.log(room.text);
           return (
-            <Button
-              variant="info"
+            <RoomContainer
               onClick={() => {
                 setChatroom(room.text);
               }}
             >
               {room.text}
-            </Button>
+            </RoomContainer>
           );
         })}
-      <form onSubmit={newRoom}>
+      <h5 style={{ margin: "1rem 0 .5rem 0" }}>Add a new chat</h5>
+      <MyForm onSubmit={newRoom}>
         <input
           value={formValue}
           onChange={(e) => setFormValue(e.target.value)}
@@ -66,7 +70,7 @@ export const PickChat = ({ rooms, setChatroom, roomsRef }) => {
         <button type="submit" disabled={!formValue}>
           Submit
         </button>
-      </form>
+      </MyForm>
     </React.Fragment>
   );
 };
@@ -78,10 +82,12 @@ export const ChatMessage = ({ message }) => {
 
   return (
     <>
-      <div className={`message ${messageClass}`}>
-        <img src={photoURL} />
-        <p>{text}</p>
-      </div>
+      <MessageContainer>
+        <div className={messageClass}>
+          <img src={photoURL} />
+          <p>{text}</p>
+        </div>
+      </MessageContainer>
     </>
   );
 };
@@ -124,7 +130,7 @@ export const ChatRoom = ({ roomNumber }) => {
         <span ref={dummy}></span>
       </main>
 
-      <form onSubmit={sendMessage}>
+      <SendChat onSubmit={sendMessage}>
         <input
           value={formValue}
           onChange={(e) => setFormValue(e.target.value)}
@@ -134,7 +140,125 @@ export const ChatRoom = ({ roomNumber }) => {
         <button type="submit" disabled={!formValue}>
           >
         </button>
-      </form>
+      </SendChat>
     </>
   );
 };
+
+const MessageContainer = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 0.25rem 0;
+
+  & > div {
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    width: 100%;
+  }
+
+  p {
+    margin: 0;
+    border-radius: ${theme.borderRadius};
+    padding: 0.25rem 0.5rem;
+  }
+
+  img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin: 2px 5px;
+  }
+
+  .sent {
+    flex-direction: row-reverse;
+  }
+
+  .sent {
+    align-self: flex-end;
+  }
+
+  .sent > p {
+    color: white;
+    background-color: #0b93f6;
+    align-self: flex-end;
+  }
+
+  .received > p {
+    background-color: #e5e5ea;
+    color: black;
+  }
+
+  .received {
+  }
+`;
+
+const SendChat = styled.form`
+  height: 10vh;
+  position: fixed;
+  bottom: 0;
+  background-color: rgb(24, 23, 23);
+  width: 100%;
+  max-width: 728px;
+  display: flex;
+  font-size: 1.5rem;
+
+  button {
+    width: 20%;
+    background-color: rgb(56, 56, 143);
+  }
+
+  input {
+    line-height: 1.5;
+    width: 100%;
+    font-size: 1.5rem;
+    background: rgb(58, 58, 58);
+    color: white;
+    outline: none;
+    border: none;
+    padding: 0 10px;
+  }
+`;
+
+const RoomContainer = styled.div`
+  background-color: ${theme.colors.blue200};
+  border-radius: ${theme.borderRadius};
+  text-align: center;
+  margin: 0.25rem 0;
+  max-width: 300px;
+
+  &:hover {
+    background-color: ${theme.colors.blue300};
+    cursor: pointer;
+  }
+`;
+
+const MyForm = styled.form`
+  input {
+    border: transparent;
+    border-radius: 0.25rem 0 0 0.25rem;
+    background-color: ${theme.colors.grey100};
+    padding: 0.25rem;
+  }
+
+  input:focus {
+    outline: none;
+  }
+
+  button {
+    border-radius: 0 0.25rem 0.25rem 0;
+    border: transparent;
+    background-color: ${theme.colors.blue200};
+    color: ${theme.colors.grey700};
+    padding: 0.25rem;
+  }
+  button:disabled {
+    color: ${theme.colors.grey500};
+
+    background-color: ${theme.colors.blue100};
+  }
+  button:hover {
+    cursor: pointer;
+  }
+`;

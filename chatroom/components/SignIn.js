@@ -6,6 +6,8 @@ import "firebase/firestore";
 import "firebase/auth";
 import "firebase/analytics";
 
+import { firestore, auth } from "../utils/firebase";
+
 export const SignIn = () => {
   const signInWithGoogle = () => {
     const provider = new firebase.auth.GoogleAuthProvider();

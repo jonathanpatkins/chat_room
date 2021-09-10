@@ -1,4 +1,4 @@
-const theme = {
+export const theme = {
   mediaQueries: {
     mobileS: "(max-width: 320px)",
     mobileM: "(max-width: 375px)",
