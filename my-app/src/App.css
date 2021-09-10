@@ -70,7 +70,6 @@ form button {
   background-color: rgb(56, 56, 143);
 }
 
-
 input {
   line-height: 1.5;
   width: 100%;
@@ -82,9 +81,9 @@ input {
   padding: 0 10px;
 }
 
-button {
+/* button {
   background-color: #282c34;
-  /* Green */
+  
   border: none;
   color: white;
   padding: 15px 32px;
@@ -98,8 +97,7 @@ button {
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
+} */
 
 .sign-in {
   color: #282c34;
@@ -107,9 +105,6 @@ button:disabled {
   max-width: 400px;
   margin: 0 auto;
 }
-
-
-
 
 ul,
 li {
@@ -132,7 +127,6 @@ p {
   display: flex;
   align-items: center;
 }
-
 
 .sent {
   flex-direction: row-reverse;
