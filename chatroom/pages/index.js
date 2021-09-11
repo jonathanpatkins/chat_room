@@ -4,6 +4,7 @@ import React, { useState, Component, useRef } from "react";
 import Layout from "../components/Layout";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
+import theme from "../styles/theme";
 
 import { firestore, auth } from "../utils/firebase";
 
@@ -25,18 +26,21 @@ export default function Home() {
   return (
     <Layout>
       <IndexContainer fluid>
-        <div>
-          <h3>List of Rooms</h3>
-          <section>{user ? <ListOfChats /> : <SignIn />}</section>
-        </div>
+        {/* <h3>List of Rooms</h3> */}
+        <section>{user ? <ListOfChats /> : <SignIn />}</section>
       </IndexContainer>
     </Layout>
   );
 }
 
 const IndexContainer = styled(Container)`
+  width: 100%;
+  height: 100vh;
+  background-color: ${theme.colors.green100};
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  overflow: auto;
+  padding: 1rem 0;
 `;

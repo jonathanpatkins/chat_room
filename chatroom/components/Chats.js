@@ -1,5 +1,7 @@
 import React, { useState, Component, useRef } from "react";
 
+import Container from "react-bootstrap/Container";
+
 import Button from "react-bootstrap/Button";
 
 import { firestore, auth } from "../utils/firebase";
@@ -21,7 +23,7 @@ export const ListOfChats = () => {
   return (
     <React.Fragment>
       {chatroom ? (
-        <ChatRoom roomNumber={chatroom} />
+        <ChatRoom roomNumber={chatroom} setChatroom={setChatroom} />
       ) : (
         <PickChat rooms={rooms} setChatroom={setChatroom} roomsRef={roomsRef} />
       )}
@@ -35,6 +37,8 @@ export const PickChat = ({ rooms, setChatroom, roomsRef }) => {
   const newRoom = async (e) => {
     // 1. add a new chat to firebase
     // 2. set us to the new room
+
+    // if inside the list of rooms
     e.preventDefault();
     await roomsRef.add({
       text: formValue,
@@ -48,11 +52,12 @@ export const PickChat = ({ rooms, setChatroom, roomsRef }) => {
     <React.Fragment>
       {rooms &&
         rooms.map((room) => {
-          console.log(room.text);
+          // console.log(room.text);
+          console.log(room.id);
           return (
             <RoomContainer
               onClick={() => {
-                setChatroom(room.text);
+                setChatroom(room.id);
               }}
             >
               {room.text}
@@ -77,12 +82,13 @@ export const PickChat = ({ rooms, setChatroom, roomsRef }) => {
 
 export const ChatMessage = ({ message }) => {
   const { text, uid, photoURL } = message;
+  // console.log(message);
 
   const messageClass = uid === auth.currentUser.uid ? "sent" : "received";
 
   return (
     <>
-      <MessageContainer>
+      <MessageContainer fluid>
         <div className={messageClass}>
           <img src={photoURL} />
           <p>{text}</p>
@@ -92,10 +98,10 @@ export const ChatMessage = ({ message }) => {
   );
 };
 
-export const ChatRoom = ({ roomNumber }) => {
+export const ChatRoom = ({ roomNumber, setChatroom }) => {
   const dummy = useRef();
   const messagesRef = firestore.collection(`messages${roomNumber}`);
-  const query = messagesRef.orderBy("createdAt");
+  const query = messagesRef.orderBy("createdAt", "desc").limit(25);
 
   const [messages] = useCollectionData(query, { idField: "id" });
   // console.log(messages);
@@ -120,34 +126,97 @@ export const ChatRoom = ({ roomNumber }) => {
 
   return (
     <>
-      <div>
-        <h3>{roomNumber}</h3>
-      </div>
-      <main>
-        {messages &&
-          messages.map((msg) => <ChatMessage key={msg.id} message={msg} />)}
-
-        <span ref={dummy}></span>
-      </main>
-
-      <SendChat onSubmit={sendMessage}>
-        <input
-          value={formValue}
-          onChange={(e) => setFormValue(e.target.value)}
-          placeholder="say something nice"
-        />
-
-        <button type="submit" disabled={!formValue}>
+      <Chat fluid>
+        <div className={"header"}>
+          <h3>{roomNumber}</h3>
+          <Button
+            onClick={() => {
+              setChatroom(null);
+            }}
           >
-        </button>
-      </SendChat>
+            Go Back
+          </Button>
+        </div>
+        <div className={"chatmessages"}>
+          <span ref={dummy}></span>
+          {messages &&
+            messages.map((msg) => <ChatMessage key={msg.id} message={msg} />)}
+        </div>
+        <SendChat onSubmit={sendMessage}>
+          <input
+            value={formValue}
+            onChange={(e) => setFormValue(e.target.value)}
+            placeholder="type something in"
+          />
+          <button type="submit" disabled={!formValue}>
+            >
+          </button>
+        </SendChat>
+      </Chat>
     </>
   );
 };
 
+const Chat = styled(Container)`
+  padding: 0;
+  margin: 0;
+  width: 700px;
+  height: 100vh;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  background-color: ${theme.colors.grey100};
+
+  .header {
+    text-align: center;
+    background-color: ${theme.colors.grey900};
+    color: ${theme.colors.grey50};
+    padding: 0.75rem;
+  }
+
+  .header h3 {
+    margin: 0 0 0.5rem 0;
+  }
+
+  .chatmessages {
+    display: flex;
+    flex-direction: column-reverse;
+    overflow-y: scroll;
+    flex: 1;
+    padding: 0 0.5rem;
+  }
+`;
+
+const SendChat = styled.form`
+  height: 3rem;
+  background-color: ${theme.colors.grey900};
+  /* width: 100%; */
+  /* max-width: 728px; */
+  display: flex;
+  font-size: 1.5rem;
+
+  button {
+    width: 3rem;
+    background-color: ${theme.colors.blue700};
+    color: white;
+  }
+
+  input {
+    line-height: 1.5;
+    width: 100%;
+    font-size: 1.5rem;
+    background: rgb(58, 58, 58);
+    color: white;
+    outline: none;
+    border: none;
+    padding: 0 10px;
+  }
+`;
+
 const MessageContainer = styled.div`
   display: flex;
   align-items: center;
+  max-width: 728px;
   width: 100%;
   margin: 0.25rem 0;
 
@@ -162,6 +231,7 @@ const MessageContainer = styled.div`
     margin: 0;
     border-radius: ${theme.borderRadius};
     padding: 0.25rem 0.5rem;
+    max-width: 500px;
   }
 
   img {
@@ -173,51 +243,27 @@ const MessageContainer = styled.div`
 
   .sent {
     flex-direction: row-reverse;
-  }
-
-  .sent {
     align-self: flex-end;
+    /* justify-content: center; */
+    align-items: center;
   }
 
   .sent > p {
     color: white;
     background-color: #0b93f6;
-    align-self: flex-end;
+    /* align-self: flex-end;
+    justify-self: center; */
+    overflow: auto;
   }
 
   .received > p {
     background-color: #e5e5ea;
     color: black;
+    overflow: auto;
   }
 
   .received {
-  }
-`;
-
-const SendChat = styled.form`
-  height: 10vh;
-  position: fixed;
-  bottom: 0;
-  background-color: rgb(24, 23, 23);
-  width: 100%;
-  max-width: 728px;
-  display: flex;
-  font-size: 1.5rem;
-
-  button {
-    width: 20%;
-    background-color: rgb(56, 56, 143);
-  }
-
-  input {
-    line-height: 1.5;
-    width: 100%;
-    font-size: 1.5rem;
-    background: rgb(58, 58, 58);
-    color: white;
-    outline: none;
-    border: none;
-    padding: 0 10px;
+    align-items: center;
   }
 `;
 
