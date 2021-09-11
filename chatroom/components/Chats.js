@@ -1,4 +1,4 @@
-import React, { useState, Component, useRef } from "react";
+import React, { useState, useRef } from "react";
 
 import Container from "react-bootstrap/Container";
 
@@ -12,6 +12,10 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 import styled from "styled-components";
 
 import { theme } from "../styles/theme";
+
+import Snackbar from "@material-ui/core/Snackbar";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
 
 export const ListOfChats = () => {
   const roomsRef = firestore.collection("numberOfRooms");
@@ -34,30 +38,52 @@ export const ListOfChats = () => {
 export const PickChat = ({ rooms, setChatroom, roomsRef }) => {
   const [formValue, setFormValue] = useState("");
 
+  const [open, setOpen] = React.useState(false);
+
+  const handleClick = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
+
   const newRoom = async (e) => {
     // 1. add a new chat to firebase
     // 2. set us to the new room
 
-    // if inside the list of rooms
+    let makeNew = true;
+    for (const i in rooms) {
+      if (rooms[i].text == formValue) {
+        makeNew = false;
+      }
+    }
     e.preventDefault();
-    await roomsRef.add({
-      text: formValue,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    });
-    setFormValue("");
+    if (makeNew) {
+      await roomsRef.add({
+        text: formValue,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
 
-    setChatroom(formValue);
+      setFormValue("");
+      setChatroom(formValue);
+    } else {
+      setFormValue("");
+      handleClick();
+    }
   };
   return (
     <React.Fragment>
       {rooms &&
         rooms.map((room) => {
-          // console.log(room.text);
-          console.log(room.id);
           return (
             <RoomContainer
               onClick={() => {
-                setChatroom(room.id);
+                setChatroom(room.text);
               }}
             >
               {room.text}
@@ -76,13 +102,36 @@ export const PickChat = ({ rooms, setChatroom, roomsRef }) => {
           Submit
         </button>
       </MyForm>
+      <div>
+        <Snackbar
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+          open={open}
+          autoHideDuration={6000}
+          onClose={handleClose}
+          message="Chat room names must be unique"
+          action={
+            <React.Fragment>
+              <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={handleClose}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </React.Fragment>
+          }
+        />
+      </div>
     </React.Fragment>
   );
 };
 
 export const ChatMessage = ({ message }) => {
   const { text, uid, photoURL } = message;
-  // console.log(message);
 
   const messageClass = uid === auth.currentUser.uid ? "sent" : "received";
 
@@ -104,7 +153,6 @@ export const ChatRoom = ({ roomNumber, setChatroom }) => {
   const query = messagesRef.orderBy("createdAt", "desc").limit(25);
 
   const [messages] = useCollectionData(query, { idField: "id" });
-  // console.log(messages);
 
   const [formValue, setFormValue] = useState("");
 

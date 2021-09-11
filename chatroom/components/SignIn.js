@@ -1,4 +1,4 @@
-import React, { useState, Component, useRef } from "react";
+import React from "react";
 import Button from "react-bootstrap/Button";
 
 import firebase from "firebase/app";
@@ -6,7 +6,7 @@ import "firebase/firestore";
 import "firebase/auth";
 import "firebase/analytics";
 
-import { firestore, auth } from "../utils/firebase";
+import { auth } from "../utils/firebase";
 
 export const SignIn = () => {
   const signInWithGoogle = () => {
