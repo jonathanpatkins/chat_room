@@ -384,7 +384,7 @@ const Wrapper = styled(Container)`
   border-radius: ${theme.borderRadius};
   box-shadow: ${theme.shadows.darkShadow};
   margin: 3.5rem 1rem 1rem 1rem;
-  transform: translateX(-1rem);
+  /* transform: translateX(-1rem); */
 `;
 
 const SignOutButton = styled(Button)`
