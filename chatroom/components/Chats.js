@@ -17,6 +17,8 @@ import Snackbar from "@material-ui/core/Snackbar";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 
+import { AiOutlinePlus } from "react-icons/ai";
+
 export const ListOfChats = () => {
   const roomsRef = firestore.collection("numberOfRooms");
   const query = roomsRef.orderBy("createdAt");
@@ -78,54 +80,57 @@ export const PickChat = ({ rooms, setChatroom, roomsRef }) => {
   };
   return (
     <React.Fragment>
-      {rooms &&
-        rooms.map((room) => {
-          return (
-            <RoomContainer
-              onClick={() => {
-                setChatroom(room.text);
-              }}
-            >
-              {room.text}
-            </RoomContainer>
-          );
-        })}
-      <h5 style={{ margin: "1rem 0 .5rem 0" }}>Add a new chat</h5>
-      <MyForm onSubmit={newRoom}>
-        <input
-          value={formValue}
-          onChange={(e) => setFormValue(e.target.value)}
-          placeholder="Enter chat room name"
-        />
-
-        <button type="submit" disabled={!formValue}>
-          Submit
-        </button>
-      </MyForm>
-      <div>
-        <Snackbar
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "left",
-          }}
-          open={open}
-          autoHideDuration={6000}
-          onClose={handleClose}
-          message="Chat room names must be unique"
-          action={
-            <React.Fragment>
-              <IconButton
-                size="small"
-                aria-label="close"
-                color="inherit"
-                onClick={handleClose}
+      <SignOut />
+      <Wrapper fluid>
+        {rooms &&
+          rooms.map((room) => {
+            return (
+              <RoomContainer
+                onClick={() => {
+                  setChatroom(room.text);
+                }}
               >
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            </React.Fragment>
-          }
-        />
-      </div>
+                {room.text}
+              </RoomContainer>
+            );
+          })}
+        <h5 style={{ margin: "1rem .5rem .5rem .5rem" }}>Add a new chat</h5>
+        <MyForm onSubmit={newRoom}>
+          <input
+            value={formValue}
+            onChange={(e) => setFormValue(e.target.value)}
+            placeholder="Enter chat room name"
+          />
+          <button type="submit" disabled={!formValue}>
+            <AiOutlinePlus />
+          </button>
+        </MyForm>
+
+        <div>
+          <Snackbar
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "left",
+            }}
+            open={open}
+            autoHideDuration={6000}
+            onClose={handleClose}
+            message="Chat room names must be unique"
+            action={
+              <React.Fragment>
+                <IconButton
+                  size="small"
+                  aria-label="close"
+                  color="inherit"
+                  onClick={handleClose}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </React.Fragment>
+            }
+          />
+        </div>
+      </Wrapper>
     </React.Fragment>
   );
 };
@@ -182,7 +187,7 @@ export const ChatRoom = ({ roomNumber, setChatroom }) => {
               setChatroom(null);
             }}
           >
-            Go Back
+            Go Back &rsaquo;
           </Button>
         </div>
         <div className={"chatmessages"}>
@@ -208,7 +213,8 @@ export const ChatRoom = ({ roomNumber, setChatroom }) => {
 const Chat = styled(Container)`
   padding: 0;
   margin: 0;
-  width: 700px;
+  max-width: 700px;
+  width: 100vw;
   height: 100vh;
   overflow: auto;
   display: flex;
@@ -248,6 +254,9 @@ const SendChat = styled.form`
     background-color: ${theme.colors.blue700};
     color: white;
   }
+  button:hover {
+    cursor: pointer;
+  }
 
   input {
     line-height: 1.5;
@@ -279,7 +288,7 @@ const MessageContainer = styled.div`
     margin: 0;
     border-radius: ${theme.borderRadius};
     padding: 0.25rem 0.5rem;
-    max-width: 500px;
+    max-width: 65%;
   }
 
   img {
@@ -316,24 +325,27 @@ const MessageContainer = styled.div`
 `;
 
 const RoomContainer = styled.div`
-  background-color: ${theme.colors.blue200};
+  background-color: ${theme.colors.blue500};
   border-radius: ${theme.borderRadius};
   text-align: center;
-  margin: 0.25rem 0;
-  max-width: 300px;
+  margin: 0.25rem 0.5rem;
+  max-width: 400px;
+  color: ${theme.colors.grey50};
 
   &:hover {
-    background-color: ${theme.colors.blue300};
+    background-color: ${theme.colors.blue600};
     cursor: pointer;
   }
 `;
 
 const MyForm = styled.form`
+  margin: 0 0.5rem;
   input {
     border: transparent;
     border-radius: 0.25rem 0 0 0.25rem;
     background-color: ${theme.colors.grey100};
     padding: 0.25rem;
+    width: calc(100% - 2rem);
   }
 
   input:focus {
@@ -343,16 +355,40 @@ const MyForm = styled.form`
   button {
     border-radius: 0 0.25rem 0.25rem 0;
     border: transparent;
-    background-color: ${theme.colors.blue200};
-    color: ${theme.colors.grey700};
-    padding: 0.25rem;
+    background-color: ${theme.colors.blue500};
+    color: ${theme.colors.grey50};
+    padding: 0.25rem 0.5rem;
+    width: 2rem;
   }
   button:disabled {
-    color: ${theme.colors.grey500};
+    color: ${theme.colors.grey50};
 
-    background-color: ${theme.colors.blue100};
+    background-color: ${theme.colors.blue400};
   }
   button:hover {
     cursor: pointer;
   }
+`;
+
+const SignOut = () => {
+  return (
+    auth.currentUser && (
+      <SignOutButton onClick={() => auth.signOut()}>Sign Out</SignOutButton>
+    )
+  );
+};
+
+const Wrapper = styled(Container)`
+  background-color: ${theme.colors.green200};
+  padding: 1rem;
+  border-radius: ${theme.borderRadius};
+  box-shadow: ${theme.shadows.darkShadow};
+  margin: 3.5rem 1rem 1rem 1rem;
+  transform: translateX(-1rem);
+`;
+
+const SignOutButton = styled(Button)`
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
 `;

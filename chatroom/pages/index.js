@@ -36,7 +36,8 @@ const IndexContainer = styled(Container)`
   background-color: ${theme.colors.green100};
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   overflow: auto;
+  padding: 0;
+  margin: 0;
 `;
